@@ -47,7 +47,7 @@ testtailblocksize=${testtailblocksize-1}
 filecreateparams=${filecreateparams-'fs.createParams=1,6,3,1048576,2,15,15'}
 rsrecoveryreadsize=${rsrecoveryreadsize-524288}
 csstartport=${csstartport-20400}
-csendport=${csendport-`expr $csstartport + 1`}
+csendport=${csendport-`expr $csstartport + 2`}
 valgrind_cmd=${valgrind_cmd-''}
 recoveryforcetimes=${recoveryforcetimes-1}
 
