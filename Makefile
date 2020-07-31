@@ -104,7 +104,7 @@ python: build
 	cd build/${BUILD_TYPE} && python ../../src/cc/access/kfs_setup.py build
 
 .PHONY: test
-test: hadoop-jars
+test:
 	cd build/${BUILD_TYPE} && \
 	    ../../src/test-scripts/qfstest.sh -auth ${QFSTEST_OPTIONS} && \
             echo '--------- QC RS recovery test ---------' && \
