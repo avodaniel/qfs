@@ -11046,10 +11046,12 @@ LayoutManager::ReplicateChunk(
             continue;
         }
         const char*    reason = "none";
+        bool isEvacuated = false;
         ChunkServerPtr dataServer;
         if (iter != servers.end()) {
             ChunkServer& ds = **iter;
             reason = "evacuation";
+            isEvacuated = true;
             if (recoveryInfo.HasRecovery()) {
                 reason     = "evacuation recovery";
                 dataServer = c;
@@ -11121,6 +11123,9 @@ LayoutManager::ReplicateChunk(
                 CSMap::Entry::kStateCheckReplication) {
             SetReplicationState(clli,
                 CSMap::Entry::kStatePendingReplication);
+        }
+        if (isEvacuated) {
+            dataServer->SetRemovePending(clli.GetChunkId());
         }
         // Do not count synchronous failures.
         if (cs.ReplicateChunk(clli.GetFileId(), clli.GetChunkId(),
@@ -11513,6 +11518,19 @@ LayoutManager::CanReplicateChunkNow(
         " hibernated: " << hibernatedCount <<
         " needed: "     << extraReplicas <<
     KFS_LOG_EOM;
+
+    for (auto const& srv: servers) {
+        if (srv->IsRemovePending(chunkId)) {
+            if (mChunkToServerMap.HasServer(srv, c)) {
+                KFS_LOG_STREAM_DEBUG << "Skipping CanReplicate; srv:" << srv->GetServerLocation() << " and chunk:" << chunkId << KFS_LOG_EOM;
+                return false;
+            } else {
+                srv->EraseRemovePending(chunkId);
+                KFS_LOG_STREAM_DEBUG << "Re-allowing CanReplicate; srv:" << srv->GetServerLocation() << " and chunk:" << chunkId << KFS_LOG_EOM;
+            }
+        }
+    }
+
     if (readLeaseWaitFlag) {
         SetReplicationState(c, CSMap::Entry::kStatePendingReplication);
         return false;
