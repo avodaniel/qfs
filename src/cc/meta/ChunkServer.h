@@ -987,13 +987,6 @@ public:
     static int GetMaxChunkServerCount()
         { return sMaxChunkServerCount; }
 
-    bool IsRemovePending(chunkId_t const id) const
-        { return mChunksRemovePending.Find(id); }
-    bool EraseRemovePending(chunkId_t const id)
-        { return mChunksRemovePending.Erase(id); }
-    void SetRemovePending(chunkId_t const id)
-        { mChunksRemovePending.Insert(id); }
-
 protected:
     ChunkServer(const NetConnectionPtr& conn, const string& peerName,
         bool replayFlag = false);
@@ -1077,8 +1070,6 @@ protected:
     ChunkIdSet mChunksToMove;
 
     ChunkIdSet mChunksToEvacuate;
-
-    ChunkIdSet mChunksRemovePending;
 
     /// Location of the server at which clients can
     /// connect to
